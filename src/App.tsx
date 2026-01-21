@@ -5,18 +5,24 @@ type Term = { term: string; time: Date };
 type Result = { title: string; url: string };
 
 export default function App() {
-  const [apiResponse, setApiResponse] = useState<WikiApiResponse>();
   const [history, setHistory] = useState<Term[]>([]);
   const [searchTerm, setSearchTerm] = useState<Term>({ term: '', time: new Date() });
   const [results, setResults] = useState<Result[]>([]);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const sortedHistory = history.slice().sort((a, b) => Number(a.time) - Number(b.time));
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!searchTerm.term) return;
-
+		
     handleHistory();
-    fetchResults();
-    handleResults();
+    const response: WikiApiResponse = await fetchResults();
+    if (response) {
+      const [_, title, __, link] = response;
+
+      const newResults = title.map((name, i) => ({ title: name, url: link[i] }));
+      setResults(newResults);
+    }
   }
 
   function handleHistory() {
@@ -30,8 +36,8 @@ export default function App() {
           ]
         : [{ term: `${searchTerm.term}`, time: new Date() }, ...history.slice(0, 4)];
 
-    setHistory(newHistory);
     setSearchTerm((prev) => ({ ...prev, term: '' }));
+    setHistory(newHistory);
   }
 
   async function fetchResults() {
@@ -39,20 +45,9 @@ export default function App() {
       const response = await fetch(
         `https://en.wikipedia.org/w/api.php?action=opensearch&search=${searchTerm.term}&format=json&origin=*`,
       );
-      setApiResponse(await response.json());
+      return await response.json();
     } catch (error) {
       console.error('Fetch failed:', error);
-    }
-  }
-
-  function handleResults() {
-    if (apiResponse) {
-      const [_, title, __, link] = apiResponse;
-      const newResults: Result[] = [];
-
-      title.forEach((name) => newResults.map((r) => ({ ...r, title: name })));
-      link.forEach((url) => newResults.map((r) => ({ ...r, url: url })));
-      setResults(newResults);
     }
   }
 
@@ -71,7 +66,7 @@ export default function App() {
     );
   });
 
-  const historyDisplay = history.map(({ term, time }, i) => {
+  const historyDisplay = sortedHistory.map(({ term, time }, i) => {
     return (
       <li className="gap-2 flex" key={i}>
         <span className="font-medium">{term} - </span>
