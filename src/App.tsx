@@ -16,6 +16,7 @@ export default function App() {
 
     handleHistory();
     fetchResults();
+    handleResults();
   }
 
   function handleHistory() {
@@ -43,6 +44,32 @@ export default function App() {
       console.error('Fetch failed:', error);
     }
   }
+
+  function handleResults() {
+    if (apiResponse) {
+      const [_, title, __, link] = apiResponse;
+      const newResults: Result[] = [];
+
+      title.forEach((name) => newResults.map((r) => ({ ...r, title: name })));
+      link.forEach((url) => newResults.map((r) => ({ ...r, url: url })));
+      setResults(newResults);
+    }
+  }
+
+  const resultDisplay = results.map(({ title, url }, i) => {
+    return (
+      <li key={i}>
+        <a
+          href={url}
+          className="underline text-blue-500 hover:text-blue-700"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {title}
+        </a>
+      </li>
+    );
+  });
 
   const historyDisplay = history.map(({ term, time }, i) => {
     return (
@@ -87,18 +114,7 @@ export default function App() {
           <div>
             <h2 className="text-2xl mb-4">Results</h2>
 
-            <ul>
-              <li>
-                <a
-                  href="{result.url}"
-                  className="underline text-blue-500 hover:text-blue-700"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  result.title
-                </a>
-              </li>
-            </ul>
+            <ul>{resultDisplay}</ul>
           </div>
 
           <div>
