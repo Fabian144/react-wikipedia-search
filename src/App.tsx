@@ -57,8 +57,6 @@ export default function App() {
           <div className="flex">
             <input
               id="search"
-              name="term"
-              type="text"
               onChange={(e) => setSearchTerm({ term: e.target.value, time: new Date() })}
               value={searchTerm.term}
               className="grow font-light rounded-l-lg border-gray-300 border px-4 py-2"
