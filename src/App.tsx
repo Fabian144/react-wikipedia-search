@@ -12,11 +12,12 @@ export default function App() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!searchTerm.term) return;
+
     handleHistory();
   }
 
   function handleHistory() {
-    if (!searchTerm.term) return;
     const existingTerm = history.filter((h) => h.term === searchTerm.term);
 
     const newHistory = existingTerm
