@@ -17,14 +17,14 @@ export default function App() {
 
   function handleHistory() {
     if (!searchTerm.term) return;
-    const existingTerm = history
-      .filter((h) => h.term === searchTerm.term)
-      .map((h) => ({ ...h, time: new Date() }));
+    const existingTerm = history.filter((h) => h.term === searchTerm.term);
 
-    const newHistory =
-      existingTerm.length > 0
-        ? [...existingTerm, ...history.filter((h) => h.term !== searchTerm.term)]
-        : [{ term: `${searchTerm.term}`, time: new Date() }, ...history.slice(0, 4)];
+    const newHistory = existingTerm
+      ? [
+          ...existingTerm.map((h) => ({ ...h, time: new Date() })),
+          ...history.filter((h) => h.term !== existingTerm[0].term),
+        ]
+      : [{ term: `${searchTerm.term}`, time: new Date() }, ...history.slice(0, 4)];
 
     setHistory(newHistory);
     setSearchTerm((prev) => ({ ...prev, term: '' }));
