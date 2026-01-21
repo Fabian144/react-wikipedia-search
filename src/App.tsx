@@ -14,7 +14,7 @@ export default function App() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!searchTerm) return;
-		
+
     handleHistory();
     const response: WikiApiResponse = await fetchResults();
     if (response) {
@@ -26,18 +26,12 @@ export default function App() {
   }
 
   function handleHistory() {
-    const existingTerm = history.filter((h) => h.term === searchTerm);
+    const originalTerms = history.filter((h) => h.term !== searchTerm);
 
-    const newHistory =
-      existingTerm.length > 0
-        ? [
-            ...existingTerm.map((h) => ({ ...h, time: new Date() })),
-            ...history.filter((h) => h.term !== existingTerm[0].term),
-          ]
-        : [{ term: `${searchTerm}`, time: new Date() }, ...history.slice(0, 4)];
+    const newHistory = [...originalTerms, { term: searchTerm, time: new Date() }].slice(-5);
 
-    setSearchTerm('');
     setHistory(newHistory);
+    setSearchTerm('');
   }
 
   async function fetchResults() {
