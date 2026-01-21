@@ -5,16 +5,17 @@ type Term = { term: string; time: Date };
 type Result = { title: string; url: string };
 
 export default function App() {
-  const [response, setResponse] = useState<WikiApiResponse>();
+  const [apiResponse, setApiResponse] = useState<WikiApiResponse>();
   const [history, setHistory] = useState<Term[]>([]);
   const [searchTerm, setSearchTerm] = useState<Term>({ term: '', time: new Date() });
   const [results, setResults] = useState<Result[]>([]);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!searchTerm.term) return;
 
     handleHistory();
+    fetchResults();
   }
 
   function handleHistory() {
@@ -30,6 +31,17 @@ export default function App() {
 
     setHistory(newHistory);
     setSearchTerm((prev) => ({ ...prev, term: '' }));
+  }
+
+  async function fetchResults() {
+    try {
+      const response = await fetch(
+        `https://en.wikipedia.org/w/api.php?action=opensearch&search=${searchTerm.term}&format=json&origin=*`,
+      );
+      setApiResponse(await response.json());
+    } catch (error) {
+      console.error('Fetch failed:', error);
+    }
   }
 
   const historyDisplay = history.map(({ term, time }, i) => {
