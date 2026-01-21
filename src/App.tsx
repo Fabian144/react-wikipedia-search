@@ -6,8 +6,8 @@ type Result = { title: string; url: string };
 
 export default function App() {
   const [response, setResponse] = useState<WikiApiResponse>();
-  const [searchTerm, setSearchTerm] = useState<Term>({ term: '', time: new Date() });
   const [history, setHistory] = useState<Term[]>([]);
+  const [searchTerm, setSearchTerm] = useState<Term>({ term: '', time: new Date() });
   const [results, setResults] = useState<Result[]>([]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
