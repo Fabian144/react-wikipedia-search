@@ -5,15 +5,15 @@ type Term = { term: string; time: Date };
 type Result = { title: string; url: string };
 
 export default function App() {
+  const [searchTerm, setSearchTerm] = useState('');
   const [history, setHistory] = useState<Term[]>([]);
-  const [searchTerm, setSearchTerm] = useState<Term>({ term: '', time: new Date() });
   const [results, setResults] = useState<Result[]>([]);
 
   const sortedHistory = history.slice().sort((a, b) => Number(a.time) - Number(b.time));
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!searchTerm.term) return;
+    if (!searchTerm) return;
 		
     handleHistory();
     const response: WikiApiResponse = await fetchResults();
@@ -26,7 +26,7 @@ export default function App() {
   }
 
   function handleHistory() {
-    const existingTerm = history.filter((h) => h.term === searchTerm.term);
+    const existingTerm = history.filter((h) => h.term === searchTerm);
 
     const newHistory =
       existingTerm.length > 0
@@ -34,16 +34,16 @@ export default function App() {
             ...existingTerm.map((h) => ({ ...h, time: new Date() })),
             ...history.filter((h) => h.term !== existingTerm[0].term),
           ]
-        : [{ term: `${searchTerm.term}`, time: new Date() }, ...history.slice(0, 4)];
+        : [{ term: `${searchTerm}`, time: new Date() }, ...history.slice(0, 4)];
 
-    setSearchTerm((prev) => ({ ...prev, term: '' }));
+    setSearchTerm('');
     setHistory(newHistory);
   }
 
   async function fetchResults() {
     try {
       const response = await fetch(
-        `https://en.wikipedia.org/w/api.php?action=opensearch&search=${searchTerm.term}&format=json&origin=*`,
+        `https://en.wikipedia.org/w/api.php?action=opensearch&search=${searchTerm}&format=json&origin=*`,
       );
       return await response.json();
     } catch (error) {
@@ -91,8 +91,8 @@ export default function App() {
           <div className="flex">
             <input
               id="search"
-              onChange={(e) => setSearchTerm({ term: e.target.value, time: new Date() })}
-              value={searchTerm.term}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchTerm}
               className="grow font-light rounded-l-lg border-gray-300 border px-4 py-2"
             />
 
