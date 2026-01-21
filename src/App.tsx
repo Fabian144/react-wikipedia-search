@@ -20,25 +20,24 @@ export default function App() {
   function handleHistory() {
     const existingTerm = history.filter((h) => h.term === searchTerm.term);
 
-    const newHistory = existingTerm
-      ? [
-          ...existingTerm.map((h) => ({ ...h, time: new Date() })),
-          ...history.filter((h) => h.term !== existingTerm[0].term),
-        ]
-      : [{ term: `${searchTerm.term}`, time: new Date() }, ...history.slice(0, 4)];
+    const newHistory =
+      existingTerm.length > 0
+        ? [
+            ...existingTerm.map((h) => ({ ...h, time: new Date() })),
+            ...history.filter((h) => h.term !== existingTerm[0].term),
+          ]
+        : [{ term: `${searchTerm.term}`, time: new Date() }, ...history.slice(0, 4)];
 
     setHistory(newHistory);
     setSearchTerm((prev) => ({ ...prev, term: '' }));
   }
 
   const historyDisplay = history.map(({ term, time }, i) => {
-    return term ? (
+    return (
       <li className="gap-2 flex" key={i}>
         <span className="font-medium">{term} - </span>
         <span className="font-light">{time.toLocaleString()}</span>
       </li>
-    ) : (
-      ''
     );
   });
 
